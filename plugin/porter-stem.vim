@@ -48,7 +48,7 @@ let &cpo = s:save_cpo
 " PorterStem command syntax:
 "   :PorterStem (<word>)*
 if !(exists(":PorterStem") == 2)
-  com! -nargs=* PorterStem :silent call s:PorterStem(<q-args>)
+  com! -nargs=* PorterStem call s:PorterStem(<q-args>)
 endif
 
 " Main function
@@ -68,17 +68,17 @@ fun! s:PorterStem(words_in)
 endfun
 
 fun! s:ProcessStems(stems)
-  if len(stems) == 0
+  if len(a:stems) == 0
     return
   endif
 
   let stemstr = ""
 
-  for s in stems
-    stemstr = stemstr . s . " "
+  for s in a:stems
+    let stemstr = stemstr . s . " "
   endfor
 
-  echo stemstr
+  echo "Stem result: " . stemstr
 endfun
 
 " Return word stem string
