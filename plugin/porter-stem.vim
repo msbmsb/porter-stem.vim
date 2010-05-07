@@ -148,7 +148,7 @@ fun! s:Step1b(word)
     if match(stem, s:vins) == 0
       let w = stem
       let r1 = '\(at\|bl\|iz\)$'
-      let r2 = '^.\+[^aeiouylsz][^aeiouylsz]$'
+      let r2 = '^.\+\([^aeiouylsz]\)\1$'
       let r3 = '^'.s:conseq.s:vow.'[^aeiouwxy]$'
       if match(w, r1) == 0
         let w = w . "e"
@@ -204,7 +204,7 @@ endfun
 
 fun! s:Step4(word)
   let w = a:word
-  let re41 = '^\(.\+\)\(al\|ance\|ence\|er\|ic\|able\|ible\|ant\|ement\|ment\|ent\|ou\|ism\|ate\|iti\|ous\|ive\|ize\)$'
+  let re41 = '^\(.\{-1,}\)\(al\|ance\|ence\|er\|ic\|able\|ible\|ant\|ement\|ment\|ent\|ou\|ism\|ate\|iti\|ous\|ive\|ize\)$'
   let re42 = '^\(.\+\)\(s\|t\)\(ion\)$'
   if match(w, re41) == 0
     let stem = substitute(w, re41, '\1', "")
@@ -224,7 +224,7 @@ endfun
 fun! s:Step5a(word)
   let w = a:word
   if w[-1:] == "e"
-    let stem = w[:-1]
+    let stem = w[:-2]
     let re5a = '^'.s:conseq.s:vow.'[^aeiouwxy]$'
     if (match(stem, s:mgr1) == 0) || (match(stem, s:meq1) == 0) || (match(stem, re5a) == 0)
       let w = stem
@@ -236,8 +236,8 @@ endfun
 
 fun! s:Step5b(word)
   let w = a:word
-  if (match(w, 'll$') == 0) || (match(w, s:mgr1) == 0)
-    let w = w[:-1]
+  if (match(w, 'll$') > 0) && (match(w, s:mgr1) == 0)
+    let w = w[:-2]
   endif
 
   return w

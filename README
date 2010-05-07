@@ -1,3 +1,31 @@
+PorterStem is a vim script that implements the Porter stemming algorithm, by Martin Porter, details of which can be found at: http://tartarus.org/~martin/PorterStemmer/
+
+The main function outputs the single string of the stem, and the script only
+echoes the output to the screen. This script, while it can be used as-is
+if you want to know what the stem for a word is, is mostly a container for 
+the algorithm implementation in vim script.
+
+PorterStem command syntax:
+-  :PorterStem (<word>)*
+
+Each word input to the :PorterStem command will be stemmed and processed by
+the ProcessStem function, that by default simply echoes to the screen.
+Without any word given for input, it will attempt to stem the current word 
+under the cursor via expand('<cword>').
+
+For example:
+-  :PorterStem searching
+will output:
+-  search
+and a string of words will work as well, matching in order:
+-  :PorterStem thieves are running from the bunny
+will output:
+-  thiev are run from bunni
+
+----
 To use this vim script, add it to ~/.vim/plugin/
 
 See doc/porter-stem.vim.txt for more information about the script.
+See http://github.com/msbmsb/stem-search.vim for a script that uses this method for reverse-stem searching in a file.
+
+----
