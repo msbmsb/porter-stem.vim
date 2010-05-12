@@ -87,8 +87,17 @@ fun! s:GetWordStem(word)
     return a:word
   endif
 
+  let newword = a:word
+
+  " initial y fix
+  let changedY = 0
+  if newword[0] == 'y'
+    let newword = 'Y'.newword[1:]
+    let changedY = 1
+  endif
+
   " Porter Stemming
-  let newword = s:Step1a(a:word)
+  let newword = s:Step1a(newword)
   let newword = s:Step1b(newword)
   let newword = s:Step1c(newword)
   let newword = s:Step2(newword)
@@ -96,6 +105,10 @@ fun! s:GetWordStem(word)
   let newword = s:Step4(newword)
   let newword = s:Step5a(newword)
   let newword = s:Step5b(newword)
+
+  if changedY
+    let newword = 'y'.newword[1:]
+  endif
 
   return newword
 endfun
@@ -124,9 +137,9 @@ fun! s:Step1a(word)
   if a:word[-1:] ==? 's'
     let re1a1 = '^\(.\+\)\(ss\|i\)es$'
     let re1a2 = '^\(.\+\)\([^s]\)s$'
-    if match(w, re1a1) == 0
+    if w =~ re1a1
       let w = substitute(w, re1a1, '\1\2', "")
-    elseif match(w, re1a2) == 0
+    elseif w =~ re1a2
       let w = substitute(w, re1a2, '\1\2', "")
     endif
   endif
@@ -138,23 +151,23 @@ fun! s:Step1b(word)
   let w = a:word
   let re1b1 = '^\(.\+\)eed$'
   let re1b2 = '^\(.\+\)\(ed\|ing\)$'
-  if match(w, re1b1) == 0
+  if w =~ re1b1
     let stem = substitute(w, re1b1, '\1', "")
-    if match(stem, s:mgr0) == 0
+    if stem =~ s:mgr0
       let w = w[:-2]
     endif
-  elseif match(w, re1b2) == 0
+  elseif w =~ re1b2
     let stem = substitute(w, re1b2, '\1', "")
-    if match(stem, s:vins) == 0
+    if stem =~ s:vins
       let w = stem
       let r1 = '\(at\|bl\|iz\)$'
-      let r2 = '^.\+\([^aeiouylsz]\)\1$'
+      let r2 = '\([^aeiouylsz]\)\1$'
       let r3 = '^'.s:conseq.s:vow.'[^aeiouwxy]$'
-      if match(w, r1) == 0
+      if w =~ r1
         let w = w . "e"
-      elseif match(w, r2) == 0
+      elseif w =~ r2
         let w = w[:-2]
-      elseif match(w, r3) == 0
+      elseif w =~ r3
         let w = w . "e"
       endif
     endif
@@ -167,7 +180,7 @@ fun! s:Step1c(word)
   let w = a:word
   if w[-1:] == 'y'
     let stem = w[:-2]
-    if match(stem, s:vins) == 0
+    if stem =~ s:vins
       let w = stem . "i"
     endif
   endif
@@ -177,10 +190,10 @@ endfun
 
 fun! s:Step2(word)
   let w = a:word
-  if match(w, s:gen) == 0
+  if w =~ s:gen
     let stem = substitute(w, s:gen, '\1', "")
     let suff = substitute(w, s:gen, '\2', "")
-    if match(stem, s:mgr0) == 0
+    if stem =~ s:mgr0
       let w = stem . s:step2dict[suff]
     endif
   endif
@@ -191,12 +204,12 @@ endfun
 fun! s:Step3(word)
   let w = a:word
   let re3 = '^\(.\+\)\(icate\|ative\|alize\|iciti\|ical\|ful\|ness\)$'
-  if match(w, re3) == 0
+  if w =~ re3
     let stem = substitute(w, re3, '\1', "")
     let suff = substitute(w, re3, '\2', "")
-    if match(stem, s:mgr0) == 0
-    endif
+    if stem =~ s:mgr0
       let w = stem . s:step3dict[suff]
+    endif
   endif
 
   return w
@@ -206,14 +219,14 @@ fun! s:Step4(word)
   let w = a:word
   let re41 = '^\(.\{-1,}\)\(al\|ance\|ence\|er\|ic\|able\|ible\|ant\|ement\|ment\|ent\|ou\|ism\|ate\|iti\|ous\|ive\|ize\)$'
   let re42 = '^\(.\+\)\(s\|t\)\(ion\)$'
-  if match(w, re41) == 0
+  if w =~ re41
     let stem = substitute(w, re41, '\1', "")
-    if match(stem, s:mgr1) == 0
+    if stem =~ s:mgr1
       let w = stem
     endif
-  elseif match(w, re42) == 0
+  elseif w =~ re42
     let stem = substitute(w, re42, '\1\2', "")
-    if match(stem, s:mgr1) == 0
+    if stem =~ s:mgr1
       let w = stem
     endif
   endif
@@ -226,7 +239,7 @@ fun! s:Step5a(word)
   if w[-1:] == "e"
     let stem = w[:-2]
     let re5a = '^'.s:conseq.s:vow.'[^aeiouwxy]$'
-    if (match(stem, s:mgr1) == 0) || (match(stem, s:meq1) == 0) || (match(stem, re5a) == 0)
+    if (stem =~ s:mgr1) || ((stem =~ s:meq1) && (stem !~ re5a))
       let w = stem
     endif
   endif
@@ -236,7 +249,7 @@ endfun
 
 fun! s:Step5b(word)
   let w = a:word
-  if (match(w, 'll$') > 0) && (match(w, s:mgr1) == 0)
+  if (w =~ 'll$') && (w =~ s:mgr1)
     let w = w[:-2]
   endif
 
