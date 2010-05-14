@@ -3,7 +3,7 @@
 " Author:       Mitchell Bowden <mitchellbowden AT gmail DOT com>
 " Version:      0.1
 " License:      Vim License
-" Last Changed: 2 May 2010
+" Last Changed: 12 May 2010
 " URL:          http://github.com/msbmsb/porter-stem.vim/
 
 " -----------------------------------------------------------------------------
@@ -32,6 +32,12 @@
 " will output:
 "   thiev are run from bunni
 "
+" Running :PorterTest <test-file> <expected-results-file> will run each 
+" word in <test-file> and match the stem result to the same line in the 
+" <expected-results-file>, showing if any are incorrect stem matches.
+" Provided in the github repository are two files voc.txt and output.txt 
+" from Martin Porter's site providing a set of test words. 
+"
 " -----------------------------------------------------------------------------
 
 let s:save_cpo = &cpo
@@ -49,7 +55,44 @@ let &cpo = s:save_cpo
 "   :PorterStem (<word>)*
 if !(exists(":PorterStem") == 2)
   com! -nargs=* PorterStem call s:PorterStem(<q-args>)
+  com! -nargs=* PorterTest call s:PorterTest(<q-args>)
 endif
+
+" Test the stemmer with two input files
+" Usage: :PorterTest <test-file> <expected-results-file>
+fun! s:PorterTest(files_in)
+  let testfiles = split(a:files_in, '\s\+')
+
+  if len(testfiles) != 2
+    echo "Usage: :PorterTest <test-file> <expected-results-file>"
+    echo "This will print an error message if anything is incorrect"
+    return
+  endif
+
+  echo "PorterTest: Running PorterTest..."
+
+  let vocfile = testfiles[0]
+  let vocoutfile = testfiles[1]
+  let voc = readfile(vocfile)
+  let vocout = readfile(vocoutfile)
+
+  let i = 0
+  let numIncorrect = 0
+  for test in voc
+    let stem = s:GetWordStem(test)
+    if stem != vocout[i]
+      echo "PorterTest: Incorrect: " . test . " -> " . stem . " not " . vocout[i]
+      let numIncorrect = numIncorrect + 1
+    endif
+    let i = i + 1
+  endfor
+
+  if numIncorrect == 0
+    echo "PorterTest: There were no incorrect stems"
+  else
+    echo "PorterTest: There were " . numIncorrect . " incorrect stems"
+  endif
+endfun
 
 " Main function
 fun! s:PorterStem(words_in)

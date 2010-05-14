@@ -22,6 +22,12 @@ and a string of words will work as well, matching in order:
 will output:
 -  thiev are run from bunni
 
+Running :PorterTest <test-file> <expected-results-file> will run each 
+word in <test-file> and match the stem result to the same line in the 
+<expected-results-file>, showing if any are incorrect stem matches.
+Provided in the github repository are two files voc.txt and output.txt 
+from Martin Porter's site providing a set of test words.
+
 ----
 To use this vim script, add it to ~/.vim/plugin/
 
