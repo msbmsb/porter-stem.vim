@@ -2,7 +2,7 @@
 " Description:  Implements Porter Stemming in vim script
 " Author:       Mitchell Bowden <mitchellbowden AT gmail DOT com>
 " Version:      0.1
-" License:      Vim License
+" License:      MIT License: http://creativecommons.org/licenses/MIT/
 " Last Changed: 12 May 2010
 " URL:          http://github.com/msbmsb/porter-stem.vim/
 
