@@ -30,4 +30,12 @@
 " Provided in the github repository are two files voc.txt and output.txt 
 " from Martin Porter's site providing a set of test words.
 "
+" The plugin also provides a function GetWordStem(word) for public use. For
+" example:
+"
+"   echomsg "The stem for stemming is" GetWordStem('stemming')
+"
+" will output:
+"
+"   The stem for stemming is stem
 " -----------------------------------------------------------------------------
